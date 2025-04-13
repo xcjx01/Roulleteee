@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Warp Roulette</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <script>
+  const socket = io();
+
+  // Menerima gameState dari server
+  socket.on('gameState', (state) => {
+    document.getElementById('countdownTimer').innerText = `Waktu taruhan: ${state.countdown}`;
+  });
+
+  // Menerima countdown dari server tiap detik
+  socket.on('countdown', (seconds) => {
+    document.getElementById('countdownTimer').innerText = `Waktu taruhan: ${seconds}`;
+  });
+
+  // Menerima hasil spin
+  socket.on('spinResult', (number) => {
+    document.getElementById('result').innerText = `Hasil: ${number}`;
+    addToHistory(number); // Menambah hasil ke riwayat (fungsi tambahan)
+  });
+
+  // Ketika pemain lain memasang taruhan
+  socket.on('betPlaced', (bet) => {
+    // Menampilkan chip atau taruhan lain pada papan (visualisasi)
+    console.log("Taruhan dari pemain lain:", bet);
+  });
+
+  // Fungsi untuk konfirmasi taruhan yang dikirim ke server
+  function confirmBet() {
+    const selectedChip = parseFloat(document.getElementById('selectedChip').innerText);
+    const selectedPosition = window.lastBetPosition; // Variabel untuk menyimpan posisi terakhir
+
+    if (!selectedPosition) {
+      alert("Pilih posisi taruhan dulu");
+      return;
+    }
+
+    const bet = {
+      amount: selectedChip,
+      position: selectedPosition
+    };
+
+    // Emit event 'placeBet' ke server
+    socket.emit('placeBet', bet);
+  }
+
+  // Fungsi untuk menangani klik pada posisi taruhan
+  function placeBet(position, event) {
+    window.lastBetPosition = position; // Simpan posisi taruhan
+    // Kamu bisa menambah chip visual di papan jika perlu
+  }
+</script>
+</head>
+<body>
+  <!-- Tombol Connect Wallet -->
+  <div id="walletButtonContainer">
+    <button id="connectWalletButton">Connect Wallet</button>
+  </div>
+
+  <!-- Judul Game -->
+  <h2>𝓦𝓪𝓻𝓹 𝓡𝓸𝓾𝓵𝓮𝓽𝓽𝓮</h2>
+
+  <!-- Countdown Timer -->
+  <div id="countdownTimer">Betting time: 15</div>
+
+  <!-- Kontainer utama -->
+  <div id="betContainer">
+    <!-- Papan taruhan -->
+    <div id="boardWrapper">
+      <img 
+        src="papan.png" 
+        alt="Papan Taruhan" 
+        class="bet-board" 
+        usemap="#betMap"
+        width="439" 
+        height="600"
+      />
+      <div id="chipPlacementContainer"></div>
+    </div>
+
+    <!-- Area klik -->
+    <map name="betMap">
+    <area shape="poly" coords="311,19,172,68,442,70" alt="0" onClick="placeBet(0, event)">
+  <area shape="rect" coords="193,73,270,109" alt="1" onClick="placeBet('1', event)">
+  <area shape="rect" coords="272,73,349,109" alt="2" onClick="placeBet('2', event)">
+  <area shape="rect" coords="352,73,429,109" alt="3" onClick="placeBet('3', event)">
+  <area shape="rect" coords="192,112,269,148" alt="4" onClick="placeBet('4', event)">
+  <area shape="rect" coords="273,112,350,148" alt="5" onClick="placeBet('5', event)">
+  <area shape="rect" coords="351,112,428,148" alt="6" onClick="placeBet('6', event)">
+  <area shape="rect" coords="192,152,269,188" alt="7" onClick="placeBet('7', event)">
+  <area shape="rect" coords="271,151,348,187" alt="8" onClick="placeBet('8', event)">
+  <area shape="rect" coords="351,151,428,187" alt="9" onClick="placeBet('9', event)">
+  <!-- Tambahkan area untuk angka-angka 10-36 -->
+  <area shape="rect" coords="193,190,270,226" alt="10" onClick="placeBet('10', event)">
+  <area shape="rect" coords="272,190,349,226" alt="11" onClick="placeBet('11', event)">
+  <area shape="rect" coords="352,190,429,226" alt="12" onClick="placeBet('12', event)">
+  <area shape="rect" coords="192,229,269,265" alt="13" onClick="placeBet('13', event)">
+  <area shape="rect" coords="272,230,349,266" alt="14" onClick="placeBet('14', event)">
+  <area shape="rect" coords="351,229,428,265" alt="15" onClick="placeBet('15', event)">
+  <area shape="rect" coords="192,268,269,304" alt="16" onClick="placeBet('16', event)">
+  <area shape="rect" coords="272,269,349,305" alt="17" onClick="placeBet('17', event)">
+  <area shape="rect" coords="352,268,429,304" alt="18" onClick="placeBet('18', event)">
+  <area shape="rect" coords="192,307,269,343" alt="19" onClick="placeBet('19', event)">
+  <area shape="rect" coords="272,307,349,343" alt="20" onClick="placeBet('20', event)">
+  <area shape="rect" coords="351,307,428,343" alt="21" onClick="placeBet('21', event)">
+  <area shape="rect" coords="192,346,269,382" alt="22" onClick="placeBet('22', event)">
+  <area shape="rect" coords="272,347,349,383" alt="23" onClick="placeBet('23', event)">
+  <area shape="rect" coords="352,347,429,383" alt="24" onClick="placeBet('24', event)">
+  <area shape="rect" coords="192,386,269,422" alt="25" onClick="placeBet('25', event)">
+  <area shape="rect" coords="272,386,349,422" alt="26" onClick="placeBet('26', event)">
+  <area shape="rect" coords="352,385,429,421" alt="27" onClick="placeBet('27', event)">
+  <area shape="rect" coords="192,425,269,461" alt="28" onClick="placeBet('28', event)">
+  <area shape="rect" coords="272,424,349,460" alt="29" onClick="placeBet('29', event)">
+  <area shape="rect" coords="352,425,429,461" alt="30" onClick="placeBet('30', event)">
+  <area shape="rect" coords="192,464,269,500" alt="31" onClick="placeBet('31', event)">
+  <area shape="rect" coords="272,464,349,500" alt="32" onClick="placeBet('32', event)">
+  <area shape="rect" coords="351,464,428,500" alt="33" onClick="placeBet('33', event)">
+  <area shape="rect" coords="193,503,270,539" alt="34" onClick="placeBet('34', event)">
+  <area shape="rect" coords="272,503,349,539" alt="35" onClick="placeBet('35', event)">
+  <area shape="rect" coords="352,503,429,539" alt="36" onClick="placeBet('36', event)">
+  
+  <!-- Contoh area untuk taruhan Even Money -->
+  <area shape="rect" coords="7,73,99,149" alt="1-18" onClick="placeBet('1-18', event)">
+  <area shape="rect" coords="6,464,98,540" alt="19-36" onClick="placeBet('19-36', event)">
+  <area shape="rect" coords="6,151,98,227" alt="EVEN" onClick="placeBet('EVEN', event)">
+  <area shape="rect" coords="7,385,99,461" alt="ODD" onClick="placeBet('ODD', event)">
+  <area shape="rect" coords="7,307,99,383" alt="BLACK" onClick="placeBet('BLACK', event)">
+  <area shape="rect" coords="6,229,98,305" alt="RED" onClick="placeBet('RED', event)">
+  
+  <!-- Contoh area untuk taruhan 2 to 1 -->
+  <area shape="rect" coords="192,542,268,579" alt="2to1" onClick="placeBet('2to1', event)">
+  <area shape="rect" coords="272,542,348,579" alt="2to1" onClick="placeBet('2to1', event)">
+  <area shape="rect" coords="352,541,428,578" alt="2to1" onClick="placeBet('2to1', event)">
+  
+   <area shape="rect" coords="190,73,102,226" alt="1st12" onClick="placeBet('1st12', event)">  
+   <area shape="rect" coords="189,230,101,383" alt="2nd12" onClick="placeBet('2nd12', event)">  
+   <area shape="rect" coords="189,386,101,539" alt="3rd12" onClick="placeBet('3rd12', event)">
+  
+   </map>
+
+    <!-- Wallet Info -->
+    <div id="walletInfo">
+      <p>Wallet Address: <span id="walletAddress"></span></p>
+      <p>Wallet Balance: <span id="walletBalance"></span></p>
+    </div>
+
+    <!-- Chip Options -->
+    <div id="chipBalanceContainer">
+      <div id="chipOptions">
+        <button class="chip-yellow" onclick="selectChip(0.001, this)">0.001</button>
+        <button class="chip-red" onclick="selectChip(0.01, this)">0.01</button>
+        <button class="chip-blue" onclick="selectChip(0.1, this)">0.1</button>
+        <button class="chip-green" onclick="selectChip(0.2, this)">0.2</button>
+      </div>
+      <p>Selected: <span id="selectedChip">0.001</span> ETH</p>
+      <button id="betButton" onclick="confirmBet()">BET</button>
+      <button id="undoButton" onclick="undoBet()">UNDO</button>
+      <button id="clearButton" onclick="clearBets()">CLEAR</button>
+    </div>
+  </div>
+
+  <!-- Roulette Canvas -->
+  <canvas id="rouletteCanvas" width="500" height="500"></canvas>
+
+  <!-- Hasil dan Tombol Ulang -->
+  <div id="result"></div>
+
+  <!-- Riwayat Spin -->
+  <div id="spinHistoryContainer">
+    <h3>History:</h3>
+    <div id="spinHistory"></div>
+  </div>
+
+  <!-- Script utama -->
+  <script src="script.js"></script>
+</body>
+</html>
